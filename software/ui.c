@@ -561,12 +561,15 @@ void ui_active(uint8_t event, const MenuItem *item)
         ui_set_display_mode(DISP_MODE_DIM, DP_BOT);
     }
 
-    /* User whats to change value in while load is active. */
     if (event == EVENT_ENCODER_BUTTON) {
-        ui_push_item(&menu_value);
+        if (load_disable_reason != DISABLE_USER) {
+            /* User acknowledged stop. */
+            load_disable_reason = DISABLE_USER;
+        } else {
+            /* User whats to change value in while load is active. */
+            ui_push_item(&menu_value);
+        }
     }
-
-
 }
 
 void ui_activate_load()
@@ -583,12 +586,10 @@ void ui_activate_load()
 
 void ui_disable_load()
 {
-    if (load_active) {
-        load_disable(DISABLE_USER);
-        //Return to main menu, removing the "active" menu item and any subitems from stack
-        while (menu_stack_head) {
-            ui_pop_item();
-        }
+    load_disable(DISABLE_USER);
+    //Return to main menu, removing the "active" menu item and any subitems from stack
+    while (menu_stack_head) {
+        ui_pop_item();
     }
 }
 
