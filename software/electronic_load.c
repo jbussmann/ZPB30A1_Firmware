@@ -74,6 +74,7 @@ void main(void) {
     ui_init();
     
     systick_flag = 0; // Clear any overflows up to this point
+    error = 0; // Clear possible supply voltage error
     while (1) {
         if (systick_flag & SYSTICK_OVERFLOW)
         {
