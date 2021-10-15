@@ -474,6 +474,7 @@ void ui_show_values(uint8_t event)
         update = true;
         if (++state == STATE_MAX) state = STATE_V;
     }
+
     if (event == EVENT_ENCODER_DOWN) {
         manual_mode = true;
         update = true;
@@ -484,6 +485,7 @@ void ui_show_values(uint8_t event)
         switch_timer = 0;
         if (++state == STATE_MAX) state = STATE_V;
     }
+
     if (((event == EVENT_TIMER) && (++update_timer == F_SYSTICK/F_UI_UPDATE_DISPLAY)) ||
          update) {
         update_timer = 0;
@@ -502,6 +504,11 @@ void ui_show_values(uint8_t event)
                 break;
         }
         ui_number(actual_current_setpoint, CUR_DOT_OFFSET, DP_BOT);
+        if (load_regulated) {
+            display_mode[DP_BOT] &= ~DISP_MODE_BLINK_FAST;
+        } else {
+            display_mode[DP_BOT] |= DISP_MODE_BLINK_FAST;
+        }
     }
 }
 
@@ -509,14 +516,15 @@ void ui_active(uint8_t event, const MenuItem *item)
 {
     (void) item; //unused
     if (event & EVENT_PREVIEW) return; //Unsupported
+
     ui_show_values(event);
+
     if (event == EVENT_RUN_BUTTON ||
         (event == EVENT_RETURN && error != ERROR_NONE)) {
         ui_disable_load();
         return;
     }
     if (event == EVENT_ENTER || event == EVENT_RETURN) {
-
         ui_set_display_mode(DISP_MODE_DIM, DP_TOP);
         ui_set_display_mode(DISP_MODE_DIM, DP_BOT);
     }
@@ -524,6 +532,8 @@ void ui_active(uint8_t event, const MenuItem *item)
     if (event == EVENT_ENCODER_BUTTON) {
         ui_push_item(&menu_value);
     }
+
+
 }
 
 void ui_activate_load()
