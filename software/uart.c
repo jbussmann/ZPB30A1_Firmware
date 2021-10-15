@@ -50,7 +50,6 @@ static uint8_t error_code = 0;
 static inline void set_error(uint8_t code)
 {
     error_code = code;
-    error = ERROR_COMMAND;
 }
 
 void uart_handler()
@@ -81,11 +80,9 @@ void uart_handler()
             cnt = 0;
         }
         if (cnt) cnt++;
-    } else if (error == ERROR_COMMAND) {
-        if (error_code) {
-            printf("ERR:%d %d %d\r\n", cmd, param, error_code);
-            error_code = 0;
-        }
+    } else if (error_code) {
+        printf("ERR:%d %d %d\r\n", cmd, param, error_code);
+        error_code = 0;
     } else if (state == STATE_WAITING_FOR_EXECUTION) {
         printf("CMD:%c%d\r\n", cmd, param);
 
@@ -158,7 +155,6 @@ void uart_rx_irq() __interrupt(ITC_IRQ_UART2_RX)
         cmd = 0;
         param = 0;
         if (error == ERROR_COMMAND) {
-            error = 0;
             error_code = ERR_NONE;
         }
     } else if (state == STATE_UNINITIALIZED) {
@@ -177,8 +173,6 @@ void uart_rx_irq() __interrupt(ITC_IRQ_UART2_RX)
             param += c - '0';
         } else {
             set_error(ERR_NOT_A_DIGIT);
-            error = ERROR_COMMAND;
-            error_code = 1;
         }
     } else {
         set_error(ERR_SHOULD_NOT_HAPPEN);
