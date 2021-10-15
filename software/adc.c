@@ -1,3 +1,5 @@
+/* Continuously sample all active ADC channels and sum several measurements for improved accuracy. */
+
 #include "adc.h"
 #include "load.h"
 #include "config.h"
@@ -94,7 +96,7 @@ void adc_timer()
         error = ERROR_INTERNAL;
     }
     for (uint8_t i=0; i<ADC_NUM_CHANNELS; i++) {
-        // ADC is 10 bits => multiplying by 64 result in a left aligned 16 bit measurement.
+        // ADC is 10 bits => multiplying by 64 results in a left aligned 16 bit measurement.
         adc_values[i] = adc_sum[i] * (64 / ADC_SAMPLES_PER_MEASUREMENT);
         adc_sum[i] = 0;
     }

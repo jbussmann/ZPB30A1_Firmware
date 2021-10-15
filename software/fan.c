@@ -22,14 +22,16 @@ void fan_init()
 static void fan_set_pwm()
 {
     if (temperature > FAN_TEMPERATURE_FULL) {
+        // Fan at maximum speed
         fan_on = 1;
         // Over temperature protection
         if (temperature > FAN_TEMPERATURE_OTP_LIMIT) {
-            error = ERROR_OVERTEMPERATURE;
+            error = ERROR_OVERTEMPERATURE; // Setting the error flag disables the load
         }
         TIM3->CCR2H  = FAN_SPEED_FULL >> 8;
         TIM3->CCR2L  = FAN_SPEED_FULL & 0xff;
     } else if (temperature > FAN_TEMPERATURE_LOW) {
+        // Fan at variable speed
         fan_on = 1;
         #define INT_ROUND_DIV(x,y) (((x)+((y)/2))/(y))
         uint16_t fan_speed = FAN_SPEED_LOW +
@@ -39,19 +41,21 @@ static void fan_set_pwm()
         TIM3->CCR2H = fan_speed >> 8;
         TIM3->CCR2L = fan_speed & 0xff;
     } else if (fan_on && load_active && (temperature > FAN_TEMPERATURE_LOW - FAN_ON_OFF_HYSTERESIS)) {
+        // Fan below minimum temperature but above hysteresis
         TIM3->CCR2H = FAN_SPEED_LOW >> 8;
         TIM3->CCR2L = FAN_SPEED_LOW & 0xff;
     } else {
+        // Fan off (or at lowest setting if FAN_ALWAYS_ON is defined)
         fan_on = 0;
-        #if FAN_ALWAYS_ON
+#if FAN_ALWAYS_ON
         if (load_active) {
             fan_on = 1;
             TIM3->CCR2H  = FAN_SPEED_LOW >> 8;
             TIM3->CCR2L  = FAN_SPEED_LOW & 0xff;
-        } else {
-        #else
+        } else
+#endif
         {
-        #endif
+
             TIM3->CCR2H  = 0;
             TIM3->CCR2L  = 0;
         }

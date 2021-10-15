@@ -33,12 +33,11 @@ typedef enum {
 extern bool load_active;
 extern bool load_regulated;
 extern uint8_t load_disable_reason;
-extern uint16_t current_setpoint;
 extern calibration_t calibration_step;
 extern uint16_t calibration_value;
 
 /* Current setpoint after all constraints are taken into account. */
-extern uint16_t actual_current_setpoint;
+extern uint16_t current_setpoint;
 extern uint32_t mAmpere_seconds;
 extern uint32_t mWatt_seconds;
 

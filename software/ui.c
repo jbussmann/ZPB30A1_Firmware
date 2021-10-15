@@ -1,7 +1,5 @@
 #include "ui.h"
 #include "tm1650.h"
-#include "timer.h"
-#include "eeprom.h"
 #include "load.h"
 #include "config.h"
 #include "settings.h"
@@ -53,6 +51,7 @@ static uint8_t menu_stack_head = 0;
 #define current_subitem_index menu_subitem_index[menu_stack_head]
 #define current_subitem current_item->subitems[current_subitem_index]
 
+static void ui_leds(uint8_t leds);
 static void ui_text(char text[], uint8_t display);
 static void ui_number(uint16_t num, uint8_t dot, uint8_t display);
 static void ui_push_item(MenuItem *item);
@@ -77,7 +76,10 @@ void ui_init()
     run_pressed = 0; 
     encoder_val = 0;
     encoder_pressed = 0;
-    ui_push_item(&menu_main);
+    ui_leds(0);
+    current_item = &menu_main;
+    current_subitem_index = 0;
+    menu_main.handler(EVENT_ENTER, &menu_main);
 }
 
 static void ui_blink(uint8_t mode)
@@ -116,17 +118,18 @@ void ui_error_handler(uint8_t event, const MenuItem *item)
     }
     if (event == EVENT_PREVIEW || event == EVENT_TIMER) return;
     const char msgs[][5] = {"", "POL ", "OVP ", "OVLD", "PWR", "TEMP", "SUP ", "TIME", "INT ", "CMD "};
-    load_disable(DISABLE_ERROR);
+
     ui_text("ERR", DP_BOT);
     ui_text(msgs[error], DP_TOP);
     ui_set_display_mode(DISP_MODE_DIM, DP_TOP);
     ui_set_display_mode(DISP_MODE_DIM, DP_BOT);
+
     if (event == EVENT_ENCODER_BUTTON) {
-        ui_pop_item();
+        // User acknowledged error
         error = ERROR_NONE;
+        ui_pop_item();
     }
 }
-
 
 static void ui_timer_beeper()
 {
@@ -158,6 +161,7 @@ void ui_timer()
     ui_timer_blink();
     ui_timer_beeper();
     if (error && current_item != &menu_error) {
+        // Show error
         ui_push_item(&menu_error);
     }
     if (encoder_val > 0) {
@@ -178,17 +182,23 @@ void ui_timer()
     encoder_pressed = 0;
 }
 
+/* Display text. */
 static void ui_text(const char *text, uint8_t display)
 {
     for (uint8_t i=0; i<4; i++) {
-        if (display == DP_TOP || i != 3) disp_char(i, text[i], 0, display);
+        /* Bottom display only has 3 digits, 4th digits are the LEDs. */
+        if (display == DP_TOP || i != 3)
+            disp_char(i, text[i], 0, display);
     }
 }
 
+/* Display a number with automatic scaling.
+ * dot = position where the dot should go
+ */
 static void ui_number(uint16_t num, uint8_t dot, uint8_t display)
 {
-    uint16_t maximum = (display == DP_TOP)?10000:1000;
-    uint16_t digits = (display == DP_TOP)?4:3;
+    uint16_t maximum = (display == DP_TOP) ? 10000 : 1000;
+    uint16_t digits = (display == DP_TOP) ? 4 : 3;
     while (num >= maximum) {
         num /= 10;
         dot--;
@@ -200,13 +210,14 @@ static void ui_number(uint16_t num, uint8_t dot, uint8_t display)
     }
 }
 
+/* Set leds. Run led is updated automatically. */
 static void ui_leds(uint8_t leds)
 {
-    /* TODO: Blink run LED when load is out of regulation. */
     uint8_t run_led = load_active ? LED_RUN : 0;
     disp_leds(leds | run_led);
 }
 
+/* Get the number of subitems. */
 static uint8_t ui_num_subitem(const MenuItem *item)
 {
     uint8_t max_ = 0;
@@ -215,19 +226,22 @@ static uint8_t ui_num_subitem(const MenuItem *item)
     return max_;
 }
 
-// Menu item handlers
+
+/*********** Menu item handlers ***********/
+
+/* Show a new menu. */
 static void ui_push_item(const MenuItem *item)
 {
-    if (menu_stack_head != 0 || menu_stack[0] != 0) {
-        menu_stack_head++; //First push is for the main menu
-    }
+    menu_stack_head++;
     current_item = item;
     current_subitem_index = 0;
     item->handler(EVENT_ENTER, item);
 }
 
+/* Return to previous menu. */
 static void ui_pop_item()
 {
+    /* Never pop the main menu. */
     if (menu_stack_head != 0) {
         menu_stack_head--;
     }
@@ -236,14 +250,14 @@ static void ui_pop_item()
     current_item->handler(EVENT_RETURN, current_item);
 }
 
-/* This function must only be called for the currently active item. */
+/* Function to select a subitem. Used to select submenu and subitem.
+ * This function must only be called for the currently active item. */
 static void ui_select(uint8_t event, const MenuItem *item, uint8_t display)
 {
-    uint8_t display2 = display==DP_TOP?DP_BOT:DP_TOP;
     bool output = event & (EVENT_BITMASK_MENU | EVENT_BITMASK_ENCODER);
     if (event & EVENT_BITMASK_MENU) {
         ui_set_display_mode(DISP_MODE_BLINK_FAST, display);
-        ui_set_display_mode(DISP_MODE_DIM, display2);
+        ui_set_display_mode(DISP_MODE_DIM, display ^ 1); /* Dim second display. */
     }
     if (event == EVENT_ENCODER_UP) {
         if (current_subitem_index < ui_num_subitem(item) - 1) {
@@ -273,16 +287,11 @@ static void ui_select(uint8_t event, const MenuItem *item, uint8_t display)
 void ui_submenu(uint8_t event, const MenuItem *item)
 {
     if (event & EVENT_PREVIEW) {
-        // Show nothing in bottom display as preview
+        // Show nothing as preview (menu name is shown in top display by parent item's handler)
         ui_text("   ", DP_BOT);
         return;
     }
-    if (event == EVENT_RUN_BUTTON && menu_stack_head == 0)
-    {
-        //Main menu + Run button => turn on load
-        ui_activate_load();
-        return;
-    }
+
     ui_select(event, item, DP_TOP);
     if (current_subitem->handler) {
         current_subitem->handler(event | EVENT_PREVIEW, current_subitem);
@@ -292,8 +301,20 @@ void ui_submenu(uint8_t event, const MenuItem *item)
     if (event == EVENT_ENCODER_BUTTON) {
         ui_push_item(current_subitem);
     }
-
 }
+
+/* Main menu is a normal submenu handler with a special case for the run button. */
+void ui_mainmenu(uint8_t event, const MenuItem *item)
+{
+    if (event == EVENT_RUN_BUTTON)
+    {
+        //Main menu + Run button => turn on load
+        ui_activate_load();
+        return;
+    }
+    ui_submenu(event, item);
+}
+
 
 static uint8_t ui_find_active_subitem(const MenuItem *item)
 {
@@ -311,7 +332,8 @@ static uint8_t ui_find_active_subitem(const MenuItem *item)
 /** Allows selecting an item in the bottom menu.
     If the child element has an event handler it is called on selection.
     Otherwise the parent's data element is expected to point to a uint8_t
-    variable which is set to the child's data element. */
+    variable which is set to the child's data element.
+    Very similar to ui_submenu, but selection happens in the bottom menu and no subitem preview is shown (only the caption). */
 void ui_select_item(uint8_t event, const MenuItem *item)
 {
     if (event & EVENT_PREVIEW) {
@@ -414,6 +436,10 @@ void ui_edit_value(uint8_t event, const MenuItem *item)
     ui_edit_value_internal(event, edit, item->value);
 }
 
+/* Special numeric edit handler for setpoint which changes
+ * its label and the value being edited depending on the
+ * current operation mode.
+ */
 void ui_edit_setpoint(uint8_t event, const MenuItem *item)
 {
     (void) item; //unused
@@ -448,6 +474,8 @@ void ui_edit_setpoint(uint8_t event, const MenuItem *item)
     if (edit) ui_edit_value_internal(event, edit, leds);
 }
 
+/* Show measured values and setpoint in run mode.
+ * Switch automatically between values if user didn't select one. */
 void ui_show_values(uint8_t event)
 {
     static uint16_t switch_timer = 0;
@@ -491,7 +519,7 @@ void ui_show_values(uint8_t event)
         update_timer = 0;
         switch (state) {
             case STATE_V:
-                ui_leds(LED_A|LED_V); //Update run led
+                ui_leds(LED_A|LED_V);
                 ui_number(adc_get_voltage(), VOLT_DOT_OFFSET, DP_TOP);
                 break;
             case STATE_AH:
@@ -503,7 +531,10 @@ void ui_show_values(uint8_t event)
                 ui_number(mWatt_seconds/3600, WS_DOT_OFFSET, DP_TOP);
                 break;
         }
-        ui_number(actual_current_setpoint, CUR_DOT_OFFSET, DP_BOT);
+
+        ui_number(current_setpoint, CUR_DOT_OFFSET, DP_BOT);
+
+        /* Blink bottom display if load is unregulated. */
         if (load_regulated) {
             display_mode[DP_BOT] &= ~DISP_MODE_BLINK_FAST;
         } else {
@@ -520,15 +551,17 @@ void ui_active(uint8_t event, const MenuItem *item)
     ui_show_values(event);
 
     if (event == EVENT_RUN_BUTTON ||
-        (event == EVENT_RETURN && error != ERROR_NONE)) {
+        (event == EVENT_RETURN && error != ERROR_NONE) /*TODO: Why? */) {
         ui_disable_load();
         return;
     }
+
     if (event == EVENT_ENTER || event == EVENT_RETURN) {
         ui_set_display_mode(DISP_MODE_DIM, DP_TOP);
         ui_set_display_mode(DISP_MODE_DIM, DP_BOT);
     }
 
+    /* User whats to change value in while load is active. */
     if (event == EVENT_ENCODER_BUTTON) {
         ui_push_item(&menu_value);
     }
@@ -576,9 +609,11 @@ void ui_encoder_irq() __interrupt(ITC_IRQ_PORTB)
 
 void ui_button_irq() __interrupt(ITC_IRQ_PORTC)
 {
-    static uint8_t input_values = 0xFF;
-    input_values &= ~GPIOC->IDR; // store changes (H->L) for buttons
+    static uint8_t last_input_values = 0xFF;
+
+    uint8_t input_values = last_input_values & ~GPIOC->IDR; // store changes (H->L) for buttons
     encoder_pressed |= input_values & PINC_ENC_P;
     run_pressed |= input_values & PINC_RUN_P;
-    input_values = GPIOC->IDR;
+
+    last_input_values = GPIOC->IDR;
 }

@@ -7,6 +7,7 @@
 void ui_init();
 void ui_timer();
 
+void ui_mainmenu(uint8_t event, MenuItem *item);
 void ui_submenu(uint8_t event, MenuItem *item);
 void ui_select_item(uint8_t event, MenuItem *item);
 void ui_edit_value(uint8_t event, const MenuItem *item);

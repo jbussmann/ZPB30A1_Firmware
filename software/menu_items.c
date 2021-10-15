@@ -31,7 +31,7 @@ static const MenuItem menu_off = {
 
 const MenuItem menu_main = {
     .caption = "Main",
-    .handler = &ui_submenu,
+    .handler = &ui_mainmenu,
     .subitems = { &menu_mode, &menu_value, &menu_current_limit, &menu_settings, 0}
 };
 

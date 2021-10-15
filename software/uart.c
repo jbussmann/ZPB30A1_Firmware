@@ -70,7 +70,7 @@ void uart_handler()
         } else if (cnt == 5) {
             printf("Vs %5u ", v_sense);
         } else if (cnt == 6) {
-            printf("I %5u ", actual_current_setpoint);
+            printf("I %5u ", current_setpoint);
         } else if (cnt == 7) {
             printf("mWs %10lu ", mWatt_seconds);
         } else if (cnt == 8) {

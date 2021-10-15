@@ -20,7 +20,7 @@ void delay10ms(uint32_t d);
 /*
  * Func delayed N cycles, where N = 3 + ( ticks * 3 )
  * so, ticks = ( N - 3 ) / 3, minimum delay is 6 CLK
- * when tick = 1, because 0 equels 65535
+ * when tick = 1, because 0 equals 65535
  */
 #define T_COUNT(x) (( F_CPU * x / 1000000UL )-5)/5)
 static inline void _delay_cycl( unsigned short __ticks )

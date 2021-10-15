@@ -50,7 +50,6 @@
 
 /* Defintion of t and m:
    PWM = (current *  m - t) / 2^16
-   TODO: More efficient solution
 */
 #define LOAD_CAL_T 8821987L
 #define LOAD_CAL_M 350445L
@@ -119,7 +118,7 @@
 #define PIND_TLI (1u<<7)
 
 // port E
-#define PINE_ENABLE (1<<5)
+#define PINE_ENABLE (1u<<5)
 
 
 #define GPIO_DISPLAY GPIOC

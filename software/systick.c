@@ -1,4 +1,4 @@
-#include "timer.h"
+#include "systick.h"
 #include "config.h"
 #include "inc/stm8s_tim2.h"
 #include "inc/stm8s_itc.h"
