@@ -15,6 +15,7 @@ void ui_edit_setpoint(uint8_t event, const MenuItem *item);
 void ui_run_mode(uint8_t event, const MenuItem *item);
 void ui_info_mode(uint8_t event, const MenuItem *item);
 void ui_error_handler(uint8_t event, const MenuItem *item);
+void ui_clear_counters(uint8_t event, const MenuItem *item);
 
 void ui_activate_load();
 void ui_disable_load();

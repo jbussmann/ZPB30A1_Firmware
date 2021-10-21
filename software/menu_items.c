@@ -19,6 +19,7 @@ const MenuItem menu_main;
             static const MenuItem menu_cutoff_value;
         static const MenuItem menu_max_power_action;
     static const MenuItem menu_info;
+    static const MenuItem menu_clear_counters;
 
 static const MenuItem menu_on = {
     .caption = "ON ",
@@ -34,7 +35,7 @@ static const MenuItem menu_off = {
 const MenuItem menu_main = {
     .caption = "Main",
     .handler = &ui_submenu,
-    .subitems = { &menu_run, &menu_mode, &menu_value,  &menu_settings, &menu_info, 0}
+    .subitems = { &menu_run, &menu_mode, &menu_value,  &menu_settings, &menu_clear_counters, &menu_info, 0}
 };
 
 static const MenuItem menu_settings = {
@@ -172,6 +173,11 @@ const MenuItem menu_run = {
 static const MenuItem menu_info = {
     .caption = "INFO",
     .handler = &ui_info_mode,
+};
+
+static const MenuItem menu_clear_counters = {
+    .caption = "CLR",
+    .handler = &ui_clear_counters,
 };
 
 const MenuItem menu_error = {

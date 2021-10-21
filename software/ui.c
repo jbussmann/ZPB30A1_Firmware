@@ -564,6 +564,36 @@ void ui_info_mode(uint8_t event, const MenuItem *item)
     ui_run_info_mode(event);
 }
 
+void ui_clear_counters(uint8_t event, const MenuItem *item)
+{
+    static uint8_t timer = 0;
+    (void) item; // unused
+    if (event & EVENT_PREVIEW) {
+        // Show nothing as preview (this menu's name is shown in top display by parent item's handler)
+        ui_text("CNT", DP_BOT);
+        return;
+    }
+    if (event == EVENT_ENTER || event == EVENT_RETURN) {
+        ui_set_display_mode(DISP_MODE_DIM, DP_TOP);
+        ui_set_display_mode(DISP_MODE_DIM, DP_BOT);
+        ui_text("DONE", DP_TOP);
+        ui_text("   ", DP_BOT);
+        timer = 100;
+        mWatt_seconds = 0;
+        mAmpere_seconds = 0;
+    }
+
+    if (event == EVENT_TIMER) {
+        if (--timer == 0) {
+            ui_pop_item();
+        }
+    }
+
+    if (event == EVENT_RUN_BUTTON) {
+        ui_pop_item();
+    }
+}
+
 void ui_activate_load()
 {
     if (!load_active) {
