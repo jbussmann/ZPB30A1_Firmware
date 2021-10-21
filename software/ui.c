@@ -14,14 +14,11 @@
 typedef enum {
     /* Bitmask:
     Bit 0: Brightness
-    Bit 1: Blink fast
-    Bit 2: Blink slow
-    Setting bit 1 and 2 at the same time results in undefinded behaviour.
+    Bit 1: Blink
     */
     DISP_MODE_BRIGHT       = 0b000,
     DISP_MODE_DIM          = 0b001,
-    DISP_MODE_BLINK_FAST   = 0b010,
-    DISP_MODE_BLINK_SLOW   = 0b100,
+    DISP_MODE_BLINK        = 0b010,
 } display_mode_t;
 
 typedef enum {
@@ -82,30 +79,19 @@ void ui_init()
     menu_main.handler(EVENT_ENTER, &menu_main);
 }
 
-static void ui_blink(uint8_t mode)
-{
-    for (uint8_t i=0; i<2; i++)
-    {
-        if (display_mode[i] & mode) {
-            ui_set_display_mode(display_mode[i] ^ DISP_MODE_DIM, i);
-        }
-    }
-}
-
 static void ui_timer_blink()
 {
-    static uint16_t slow_timer = 0;
-    static uint16_t fast_timer = 0;
-    slow_timer++;
-    if (slow_timer == F_SYSTICK/F_DISPLAY_BLINK_SLOW) {
-        slow_timer = 0;
-        ui_blink(DISP_MODE_BLINK_SLOW);
-    }
+    static uint16_t blink_timer = 0;
 
-    fast_timer++;
-    if (fast_timer == F_SYSTICK/F_DISPLAY_BLINK_FAST) {
-        fast_timer = 0;
-        ui_blink(DISP_MODE_BLINK_FAST);
+    blink_timer++;
+    if (blink_timer == F_SYSTICK/F_DISPLAY_BLINK) {
+        blink_timer = 0;
+        for (uint8_t i=0; i<2; i++)
+        {
+            if (display_mode[i] & DISP_MODE_BLINK) {
+                ui_set_display_mode(display_mode[i] ^ DISP_MODE_DIM, i);
+            }
+        }
     }
 }
 
@@ -256,7 +242,7 @@ static void ui_select(uint8_t event, const MenuItem *item, uint8_t display)
 {
     bool output = event & (EVENT_BITMASK_MENU | EVENT_BITMASK_ENCODER);
     if (event & EVENT_BITMASK_MENU) {
-        ui_set_display_mode(DISP_MODE_BLINK_FAST, display);
+        ui_set_display_mode(DISP_MODE_BLINK, display);
         ui_set_display_mode(DISP_MODE_DIM, display ^ 1); /* Dim second display. */
     }
     if (event == EVENT_ENCODER_UP) {
@@ -281,13 +267,12 @@ static void ui_select(uint8_t event, const MenuItem *item, uint8_t display)
     }
 }
 
-
 /** Allows selecting a menu item in the top display.
     The child handler is called to update the bottom display. */
 void ui_submenu(uint8_t event, const MenuItem *item)
 {
     if (event & EVENT_PREVIEW) {
-        // Show nothing as preview (menu name is shown in top display by parent item's handler)
+        // Show nothing as preview (this menu's name is shown in top display by parent item's handler)
         ui_text("   ", DP_BOT);
         return;
     }
