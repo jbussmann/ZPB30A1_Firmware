@@ -38,6 +38,8 @@ static volatile int8_t encoder_val = 0;
 static volatile bool encoder_pressed = 0;
 static volatile bool run_pressed = 0;
 static uint8_t display_mode[] = {DISP_MODE_BRIGHT, DISP_MODE_BRIGHT};
+static bool blink_state = false;
+static uint8_t led_state = 0;
 
 #define MENU_STACK_DEPTH 5
 static const MenuItem *menu_stack[MENU_STACK_DEPTH];
@@ -86,6 +88,7 @@ static void ui_timer_blink()
     blink_timer++;
     if (blink_timer == F_SYSTICK/F_DISPLAY_BLINK) {
         blink_timer = 0;
+        blink_state = !blink_state;
         for (uint8_t i=0; i<2; i++)
         {
             if (display_mode[i] & DISP_MODE_BLINK) {
@@ -93,6 +96,16 @@ static void ui_timer_blink()
             }
         }
     }
+    uint8_t leds = led_state;
+    /* run led
+     * on: load active
+     * blinking: load automatically disabled (e.g. undervoltage cutoff, error)
+     * off: load disabled by user
+     */
+    if (load_active || ((load_disable_reason != DISABLE_USER) && blink_state)) {
+        leds |= LED_RUN;
+    }
+    disp_leds(leds);
 }
 
 void ui_error_handler(uint8_t event, const MenuItem *item)
@@ -197,10 +210,9 @@ static void ui_number(uint16_t num, uint8_t dot, uint8_t display)
 }
 
 /* Set leds. Run led is updated automatically. */
-static void ui_leds(uint8_t leds)
+static inline void ui_leds(uint8_t leds)
 {
-    uint8_t run_led = load_active ? LED_RUN : 0;
-    disp_leds(leds | run_led);
+    led_state = leds; // Hardware is updated in ui_timer_blink()
 }
 
 /* Get the number of subitems. */
