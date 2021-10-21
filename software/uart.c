@@ -27,7 +27,7 @@ void uart_timer()
 {
     static uint16_t timer = 0;
     timer++;
-    //Output one item each systick, but only start output with F_LOG
+    //Output one item as fast as possible, but only start output new sequences with F_LOG frequency
     if (timer == F_SYSTICK/F_LOG) {
         timer = 0;
         cnt = 1;
@@ -60,7 +60,7 @@ void uart_handler()
             if (load_active) {
                 status = load_regulated?'A':'U';
             }
-            printf("VAL:%c %d ", status, error);
+            printf("VAL: %c %d ", status, error);
         } else if (cnt == 2) {
             printf("T %3u ", temperature);
         } else if (cnt == 3) {
@@ -77,7 +77,7 @@ void uart_handler()
             printf("mAs %10lu ", mAmpere_seconds);
         } else {
             printf("\r\n");
-            cnt = 0;
+            cnt = 0; // Disable output till new trigger by uart_timer()
         }
         if (cnt) cnt++;
     } else if (error_code) {

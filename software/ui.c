@@ -288,19 +288,6 @@ void ui_submenu(uint8_t event, const MenuItem *item)
     }
 }
 
-/* Main menu is a normal submenu handler with a special case for the run button. */
-void ui_mainmenu(uint8_t event, const MenuItem *item)
-{
-    if (event == EVENT_RUN_BUTTON)
-    {
-        //Main menu + Run button => turn on load
-        ui_activate_load();
-        return;
-    }
-    ui_submenu(event, item);
-}
-
-
 static uint8_t ui_find_active_subitem(const MenuItem *item)
 {
     uint8_t n = ui_num_subitem(item);
@@ -521,24 +508,25 @@ void ui_show_values(uint8_t event)
 
         /* Blink bottom display if load is unregulated. */
         if (load_regulated) {
-            display_mode[DP_BOT] &= ~DISP_MODE_BLINK_FAST;
+            display_mode[DP_BOT] &= ~DISP_MODE_BLINK;
         } else {
-            display_mode[DP_BOT] |= DISP_MODE_BLINK_FAST;
+            display_mode[DP_BOT] |= DISP_MODE_BLINK;
         }
     }
 }
 
-void ui_active(uint8_t event, const MenuItem *item)
+/* Shared code from run and info mode */
+static void ui_run_info_mode(uint8_t event)
 {
-    (void) item; //unused
-    if (event & EVENT_PREVIEW) return; //Unsupported
-
-    ui_show_values(event);
-
-    if (event == EVENT_RUN_BUTTON ||
-        (event == EVENT_RETURN && error != ERROR_NONE) /*TODO: Why? */) {
-        ui_disable_load();
+    if (event & EVENT_PREVIEW) {
+        // Show nothing as preview (this menu's name is shown in top display by parent item's handler)
+        ui_text("   ", DP_BOT);
         return;
+    }
+
+    if (event == EVENT_RUN_BUTTON) {
+        load_disable(DISABLE_USER);
+        ui_pop_item();
     }
 
     if (event == EVENT_ENTER || event == EVENT_RETURN) {
@@ -546,26 +534,44 @@ void ui_active(uint8_t event, const MenuItem *item)
         ui_set_display_mode(DISP_MODE_DIM, DP_BOT);
     }
 
+    ui_show_values(event);
+}
+
+void ui_run_mode(uint8_t event, const MenuItem *item)
+{
+    if (event == EVENT_ENTER) {
+        load_enable();
+    }
     if (event == EVENT_ENCODER_BUTTON) {
         if (load_disable_reason != DISABLE_USER) {
             /* User acknowledged stop. */
             load_disable_reason = DISABLE_USER;
         } else {
-            /* User whats to change value in while load is active. */
-            ui_push_item(&menu_value);
+            /* User wants to change value while load is active. */
+            ui_push_item(item->subitems[0]);
         }
     }
+    ui_run_info_mode(event);
+}
+
+void ui_info_mode(uint8_t event, const MenuItem *item)
+{
+    (void) item; // unused
+    if (event == EVENT_ENCODER_BUTTON) {
+        // Encoder button acts as a back button in info mode
+        ui_pop_item();
+    }
+    ui_run_info_mode(event);
 }
 
 void ui_activate_load()
 {
     if (!load_active) {
-        load_enable();
         //First return to main menu and then push the special "active" menu item.
         while (menu_stack_head) {
             ui_pop_item();
         }
-        ui_push_item(&menu_active);
+        ui_push_item(&menu_run);
     }
 }
 

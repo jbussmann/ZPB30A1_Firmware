@@ -4,12 +4,13 @@
 #include "config.h"
 
 const MenuItem menu_main;
+    const MenuItem menu_run;
     static const MenuItem menu_mode;
         static const MenuItem menu_mode_CC;
         static const MenuItem menu_mode_CV;
         static const MenuItem menu_mode_R;
         static const MenuItem menu_mode_P;
-    const MenuItem menu_value;
+    static const MenuItem menu_value;
     static const MenuItem menu_current_limit;
     static const MenuItem menu_settings;
         static const MenuItem menu_beep;
@@ -17,6 +18,7 @@ const MenuItem menu_main;
             static const MenuItem menu_cutoff_enabled;
             static const MenuItem menu_cutoff_value;
         static const MenuItem menu_max_power_action;
+    static const MenuItem menu_info;
 
 static const MenuItem menu_on = {
     .caption = "ON ",
@@ -31,17 +33,15 @@ static const MenuItem menu_off = {
 
 const MenuItem menu_main = {
     .caption = "Main",
-    .handler = &ui_mainmenu,
-    .subitems = { &menu_mode, &menu_value, &menu_current_limit, &menu_settings, 0}
+    .handler = &ui_submenu,
+    .subitems = { &menu_run, &menu_mode, &menu_value,  &menu_settings, &menu_info, 0}
 };
 
 static const MenuItem menu_settings = {
     .caption = "...",
     .handler = &ui_submenu,
-    .subitems = { &menu_beep, &menu_cutoff, &menu_max_power_action, 0}
+    .subitems = { &menu_current_limit, &menu_cutoff, &menu_max_power_action, &menu_beep, 0}
 };
-
-
 
 static const MenuItem menu_mode = {
     .caption = "MODE",
@@ -98,7 +98,7 @@ const NumericEdit menu_value_edit_CW = {
     .dot_offset = POW_DOT_OFFSET,
 };
 
-const MenuItem menu_value = {
+static const MenuItem menu_value = {
     .caption = "VAL ",
     .handler = &ui_edit_setpoint,
 };
@@ -163,9 +163,15 @@ static const MenuItem menu_max_power_action = {
     .subitems = {&menu_off,  &menu_lim,  0}
 };
 
-const MenuItem menu_active = {
-    .caption = "ACT ",
-    .handler = &ui_active,
+const MenuItem menu_run = {
+    .caption = "RUN ",
+    .handler = &ui_run_mode,
+    .subitems = {&menu_value, 0},
+};
+
+static const MenuItem menu_info = {
+    .caption = "INFO",
+    .handler = &ui_info_mode,
 };
 
 const MenuItem menu_error = {
