@@ -283,7 +283,7 @@ static void ui_select(uint8_t event, const MenuItem *item, uint8_t display)
     The child handler is called to update the bottom display. */
 void ui_submenu(uint8_t event, const MenuItem *item)
 {
-    if (event & EVENT_PREVIEW) {
+    if (event == EVENT_PREVIEW) {
         // Show nothing as preview (this menu's name is shown in top display by parent item's handler)
         ui_text("   ", DP_BOT);
         return;
@@ -291,7 +291,7 @@ void ui_submenu(uint8_t event, const MenuItem *item)
 
     ui_select(event, item, DP_TOP);
     if (current_subitem->handler) {
-        current_subitem->handler(event | EVENT_PREVIEW, current_subitem);
+        current_subitem->handler(EVENT_PREVIEW, current_subitem);
     } else {
         ui_text("===", DP_BOT); //Show warning that no handler is defined (makes no sense for ui_submenu!)
     }
@@ -320,7 +320,7 @@ static uint8_t ui_find_active_subitem(const MenuItem *item)
     Very similar to ui_submenu, but selection happens in the bottom menu and no subitem preview is shown (only the caption). */
 void ui_select_item(uint8_t event, const MenuItem *item)
 {
-    if (event & EVENT_PREVIEW) {
+    if (event == EVENT_PREVIEW) {
         // Show selected value in bottom display as preview
         ui_text(item->subitems[ui_find_active_subitem(item)]->caption, DP_BOT);
         return;
@@ -350,7 +350,7 @@ void ui_edit_value_internal(uint8_t event, const NumericEdit *edit, uint8_t leds
 {
     static uint16_t value;
     uint8_t display = DP_BOT, display2 = DP_TOP;
-    if (event & EVENT_PREVIEW) {
+    if (event == EVENT_PREVIEW) {
         ui_number(*edit->var, edit->dot_offset, display);
         return;
     }
@@ -454,7 +454,7 @@ void ui_edit_setpoint(uint8_t event, const MenuItem *item)
             label = "===";
             break;
     }
-    if (!(event & EVENT_PREVIEW)) ui_text(label, DP_TOP);
+    if (event != EVENT_PREVIEW) ui_text(label, DP_TOP);
     if (edit) ui_edit_value_internal(event, edit, leds);
 }
 
@@ -530,7 +530,7 @@ void ui_show_values(uint8_t event)
 /* Shared code from run and info mode */
 static void ui_run_info_mode(uint8_t event)
 {
-    if (event & EVENT_PREVIEW) {
+    if (event == EVENT_PREVIEW) {
         // Show nothing as preview (this menu's name is shown in top display by parent item's handler)
         ui_text("   ", DP_BOT);
         return;
@@ -580,7 +580,7 @@ void ui_clear_counters(uint8_t event, const MenuItem *item)
 {
     static uint8_t timer = 0;
     (void) item; // unused
-    if (event & EVENT_PREVIEW) {
+    if (event == EVENT_PREVIEW) {
         // Show nothing as preview (this menu's name is shown in top display by parent item's handler)
         ui_text("CNT", DP_BOT);
         return;
