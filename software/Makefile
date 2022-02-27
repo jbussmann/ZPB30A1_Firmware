@@ -8,7 +8,7 @@ PROCESSOR=STM8S005K6
 STLINK_VERSION=2
 
 MAIN=electronic_load.c
-SRC=tm1650.c uart.c utils.c fan.c ui.c systick.c load.c settings.c \
+SRC=display.c uart.c utils.c fan.c ui.c systick.c load.c settings.c \
  	adc.c beeper.c menu_items.c
 BUILDDIR=build
 

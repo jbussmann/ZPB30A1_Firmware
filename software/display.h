@@ -1,5 +1,5 @@
-#ifndef _TM1650_H_
-#define _TM1650_H_
+#ifndef _DISPLAY_H_
+#define _DISPLAY_H_
 #include <stdint.h>
 
 typedef enum {

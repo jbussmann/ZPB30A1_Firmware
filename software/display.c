@@ -1,4 +1,4 @@
-#include "tm1650.h"
+#include "display.h"
 #include "config.h"
 #include "inc/stm8s_gpio.h"
 

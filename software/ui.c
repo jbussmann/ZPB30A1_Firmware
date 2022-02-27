@@ -1,5 +1,5 @@
 #include "ui.h"
-#include "tm1650.h"
+#include "display.h"
 #include "load.h"
 #include "config.h"
 #include "settings.h"
