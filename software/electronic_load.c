@@ -29,12 +29,20 @@ void gpio_init()
     GPIOB->CR1 = PINB_ENC_A | PINB_ENC_B; // Pullup
     GPIOB->CR2 = PINB_ENC_A | PINB_ENC_B; // Irq
 
+
+#ifdef DISP_DRIVER_ET6226
+    GPIOC->DDR = PINC_I_SET | PINC_SDA | PINC_SCL1 | PINC_SCL2;
+    GPIOC->CR1 = PINC_I_SET | PINC_SCL1 | PINC_SCL2 | // push pull
+                 PINC_OL_DETECT | PINC_ENC_P | PINC_RUN_P; // pullup
+    GPIOC->CR2 = PINC_OL_DETECT | PINC_ENC_P | PINC_RUN_P |  // irq
+                 PINC_SDA | PINC_SCL1 | PINC_SCL2; // 10 MHz
+#else
     GPIOC->DDR = PINC_I_SET | PINC_SCL | PINC_SDA1 | PINC_SDA2;
     GPIOC->CR1 = PINC_I_SET | PINC_SCL | // push pull
                  PINC_OL_DETECT | PINC_ENC_P | PINC_RUN_P; // pullup
     GPIOC->CR2 = PINC_OL_DETECT | PINC_ENC_P | PINC_RUN_P |  // irq
                  PINC_SCL | PINC_SDA1 | PINC_SDA2; // 10 MHz
-
+#endif
 
     GPIOD->DDR = PIND_FAN | PIND_BUS_F | PIND_BEEPER | PIND_TX;
     GPIOD->CR1 = PIND_FAN | PIND_BUS_F | PIND_BEEPER | PIND_TX | // push pull

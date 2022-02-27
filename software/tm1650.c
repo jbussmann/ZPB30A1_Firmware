@@ -2,7 +2,6 @@
 #include "config.h"
 #include "inc/stm8s_gpio.h"
 
-#define PIN_I2C_CLK PINC_SCL
 #define DIGIT_REG 0x68
 #define BRIGHTNESS_REG 0x48
 
@@ -67,36 +66,64 @@ static void i2c_write(uint8_t data, uint8_t pin)
     uint8_t i;
     GPIO_DISPLAY->DDR |= pin;
     for (i = 7; i < 255; i--) {
+#ifdef DISP_DRIVER_ET6226
+        if (data & (1 << i)) {
+            GPIO_DISPLAY->ODR |= PINC_SDA;
+        } else {
+            GPIO_DISPLAY->ODR &= ~PINC_SDA;
+        }
+        // Clock H/L
+        GPIO_DISPLAY->ODR |= pin;
+        GPIO_DISPLAY->ODR &= ~pin;
+    }
+    // We don't need the ACK, so just do a single clock H/L without reading
+    GPIO_DISPLAY->ODR |= pin;
+    GPIO_DISPLAY->ODR &= ~pin;
+#else
         if (data & (1 << i)) {
             GPIO_DISPLAY->ODR |= pin;
         } else {
             GPIO_DISPLAY->ODR &= ~pin;
         }
         // Clock H/L
-        GPIO_DISPLAY->ODR |= PIN_I2C_CLK;
-        GPIO_DISPLAY->ODR &= ~PIN_I2C_CLK;
+        GPIO_DISPLAY->ODR |= PINC_SCL;
+        GPIO_DISPLAY->ODR &= ~PINC_SCL;
     }
     // We don't need the ACK, so just do a single clock H/L without reading
-    GPIO_DISPLAY->ODR |= PIN_I2C_CLK;
-    GPIO_DISPLAY->ODR &= ~PIN_I2C_CLK;
+    GPIO_DISPLAY->ODR |= PINC_SCL;
+    GPIO_DISPLAY->ODR &= ~PINC_SCL;
+#endif
 }
 
 void disp_write(uint8_t addr, uint8_t data, uint8_t pin)
 {
-    pin = (pin == DP_TOP)?DP_TOP_PIN:DP_BOT_PIN;
+    pin = (pin == DP_TOP) ? DP_TOP_PIN : DP_BOT_PIN;
     // Start sequence
-    GPIO_DISPLAY->ODR |= pin;         // SDA HIGH
-    GPIO_DISPLAY->ODR |= PIN_I2C_CLK;  // SCL HIGH
-    GPIO_DISPLAY->ODR &= ~pin;        // SDA LOW
-    GPIO_DISPLAY->ODR &= ~PIN_I2C_CLK; // SCL LOW
+#ifdef DISP_DRIVER_ET6226
+    GPIO_DISPLAY->ODR |= PINC_SDA;  // SDA HIGH
+    GPIO_DISPLAY->ODR |= pin;       // SCL HIGH
+    GPIO_DISPLAY->ODR &= ~PINC_SDA; // SDA LOW
+    GPIO_DISPLAY->ODR &= ~pin;      // SCL LOW
+#else
+    GPIO_DISPLAY->ODR |= pin;       // SDA HIGH
+    GPIO_DISPLAY->ODR |= PINC_SCL;  // SCL HIGH
+    GPIO_DISPLAY->ODR &= ~pin;      // SDA LOW
+    GPIO_DISPLAY->ODR &= ~PINC_SCL; // SCL LOW
+#endif
 
     i2c_write(addr, pin);
     i2c_write(data, pin);
 
     // Stop sequence
-    GPIO_DISPLAY->ODR &= ~pin;        // SDA LOW
-    GPIO_DISPLAY->ODR |= PIN_I2C_CLK;  // SCL HIGH
-    GPIO_DISPLAY->ODR |= pin;         // SDA HIGH
+#ifdef DISP_DRIVER_ET6226
+    GPIO_DISPLAY->ODR &= ~PINC_SDA; // SDA LOW
+    GPIO_DISPLAY->ODR |= pin;       // SCL HIGH
+    GPIO_DISPLAY->ODR |= PINC_SDA;  // SDA HIGH
+#else
+    GPIO_DISPLAY->ODR &= ~pin;      // SDA LOW
+    GPIO_DISPLAY->ODR |= PINC_SCL;  // SCL HIGH
+    GPIO_DISPLAY->ODR |= pin;       // SDA HIGH
+#endif
 }
 
 void disp_char(uint8_t position, uint8_t c, uint8_t dot, uint8_t pin)
