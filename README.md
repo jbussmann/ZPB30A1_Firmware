@@ -19,10 +19,27 @@ back to this version once you flash a different one. But this firmware aims to
 be much better in every possible way. If you need a feature either add it on
 your own and submit a pull request or open an issue and wait till I add it.
 
-## Compiler
 
+## Compiler
 This software requires [Small Device C Compiler (SDCC)](http://sdcc.sourceforge.net/)
 version 3.8 or higher (3.7 sometimes crashes during compilation).
+
+
+## Hardware platform
+There are different hardware versions available requiring changes in the code.
+
+### Display driver
+The original units were equipped with TM1650 display drivers, whereas newer 
+units use ET6226 drivers. While the chips are pin compatible, the layout changed 
+from a shared clock line to a shared data line. The config file contains a 
+`#define DISP_DRIVER_ET6226` to uncomment for use with ET6226 drivers.
+
+The TM1650 drivers are mounted on the underside of the display board. The 
+ET6226 drivers are sandwiched between display board and LED segment displays, 
+while the underside of the board stays unpopulated. Also the ET6226 driver board 
+is possibly marked as V2.9. See image folder or [this issue](https://github.com/herm/ZPB30A1_Firmware/issues/3) 
+for further information. 
+
 
 ## Chip
 The datasheet of the STM8S005 claims a write endurance of only 100 flash cycles
