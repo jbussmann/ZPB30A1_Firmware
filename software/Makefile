@@ -45,7 +45,7 @@ $(IHX): $(REL)
 	$(CC) $(CFLAGS) $^ -o $@
 
 #-MMD = automatically create dependency files
-$(BUILDDIR)/%.rel: %.c
+$(BUILDDIR)/%.rel: %.c mkdir
 	$(CC) -c $(CFLAGS) -MMD $< -o $@
 
 $(HEX): $(IHX)
