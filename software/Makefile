@@ -11,7 +11,7 @@ SRC=tm1650.c uart.c utils.c fan.c ui.c systick.c load.c settings.c \
 BUILDDIR=build
 
 SRC:=$(MAIN) $(SRC)
-REL=$(patsubst %.c,$(BUILDDIR)/%.rel, $(SRC))
+REL=$(SRC:%.c=$(BUILDDIR)/%.rel)
 IHX=$(MAIN:%.c=$(BUILDDIR)/%.ihx)
 HEX=$(IHX:.ihx=.hex)
 DEP=$(REL:%.rel=%.d)
@@ -22,26 +22,24 @@ all: bin
 
 # SDCC includes working wrong on Windows with "/" slahes
 ifeq ($(OS),Windows_NT)
-ifeq ($(STLINK_VERSION),2)
-PROGRAMMER=ST-LINK-V2
-else
 PROGRAMMER=ST-LINK
-endif
+mkdir: mkdir_windows
+bin: bin_windows
+clean: clean_windows
 flash: flash_windows
 unlock: unlock_windows
 clear_eeprom: clear_eeprom_windows
 else
 PROGRAMMER=stlinkv$(STLINK_VERSION)
+mkdir: mkdir_unix
+bin: bin_unix
+clean: clean_unix
 flash: flash_unix
 unlock: unlock_unix
 clear_eeprom: clear_eeprom_unix
 endif
+
 CFLAGS+=$(INCLUDES) -D $(DEFINES)
-
-mkdir:
-	@mkdir -p $(BUILDDIR)
-
-bin: mkdir $(IHX)
 
 $(IHX): $(REL)
 	$(CC) $(CFLAGS) $^ -o $@
@@ -53,7 +51,20 @@ $(BUILDDIR)/%.rel: %.c
 $(HEX): $(IHX)
 	packihx $< > $@
 
-clean:
+mkdir_windows:
+	@if not exist $(BUILDDIR) mkdir $(BUILDDIR)
+
+mkdir_unix:
+	@mkdir -p $(BUILDDIR)
+
+bin_windows: mkdir $(HEX)
+
+bin_unix: mkdir $(IHX)
+
+clean_windows:
+	@rmdir /s /q $(BUILDDIR)
+
+clean_unix:
 	rm -rf $(BUILDDIR)
 
 flash_windows: $(HEX)
