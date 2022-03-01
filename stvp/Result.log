@@ -1,0 +1,226 @@
+----------------------------------------------------------
+new log session
+date:				03/01/22
+time:				09:37:19
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode ON
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Configuration:
+BoardName=ST-LINK ST-LINK_ID=0 Device=STM8L15xC6 Port=USB ProgMode=SWIM
+----------------------------------------------------------
+new log session
+date:				03/01/22
+time:				09:37:33
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode ON
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Hardware ST-LINK-V2 not found in TOOLS.CNF file
+Select a hardware programming system first
+Select a hardware programming system first
+----------------------------------------------------------
+new log session
+date:				03/01/22
+time:				09:39:09
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode ON
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Configuration:
+BoardName=ST-LINK ST-LINK_ID=0 Device=STM8L15xC6 Port=USB ProgMode=SWIM
+----------------------------------------------------------
+new log session
+date:				03/01/22
+time:				09:39:13
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode ON
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Hardware ST-LINK2 not found in TOOLS.CNF file
+Select a hardware programming system first
+Select a hardware programming system first
+----------------------------------------------------------
+new log session
+date:				03/01/22
+time:				09:39:15
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode ON
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Hardware ST-LINKv2 not found in TOOLS.CNF file
+Select a hardware programming system first
+Select a hardware programming system first
+----------------------------------------------------------
+new log session
+date:				03/01/22
+time:				09:39:19
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode ON
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Hardware ST-LINKV2 not found in TOOLS.CNF file
+Select a hardware programming system first
+Select a hardware programming system first
+----------------------------------------------------------
+new log session
+date:				03/01/22
+time:				09:39:24
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode ON
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Hardware ST-LINK-V2 not found in TOOLS.CNF file
+Select a hardware programming system first
+Select a hardware programming system first
+----------------------------------------------------------
+new log session
+date:				03/01/22
+time:				09:39:26
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode ON
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Hardware ST-LINK-2 not found in TOOLS.CNF file
+Select a hardware programming system first
+Select a hardware programming system first
+----------------------------------------------------------
+new log session
+date:				03/01/22
+time:				09:39:28
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode ON
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Hardware ST-LINK-V2 not found in TOOLS.CNF file
+Select a hardware programming system first
+Select a hardware programming system first
+----------------------------------------------------------
+new log session
+date:				03/01/22
+time:				09:42:42
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode ON
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Hardware ST-tslink not found in TOOLS.CNF file
+Select a hardware programming system first
+Select a hardware programming system first
+----------------------------------------------------------
+new log session
+date:				03/01/22
+time:				09:42:48
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode ON
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+Hardware ST-TSLNK not found in TOOLS.CNF file
+Select a hardware programming system first
+Select a hardware programming system first
+----------------------------------------------------------
+new log session
+date:				03/01/22
+time:				09:42:59
+----------------------------------------------------------
+STVP_CmdLine version 1.6
+
+Verbose ON
+Log activity ON
+Display Progress OFF
+Message box warning if protect option byte ON
+Loop mode ON
+Erase device OFF
+Blank check device OFF
+Verify device ON
+
+File C:\Code\ZPB30A1_Firmware\stvp\TOOLS.CNF : Section TOOLS.PROGRAMER.ST-TSLINK.PROTOCOLLIST.SWIM not found
+Select a hardware programming system first
+Select a hardware programming system first
