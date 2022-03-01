@@ -35,8 +35,14 @@ as claimed by the STM8S005 datasheet.
 
 
 ## Flashing
-As the original firmware has the bootloader disabled you need a STLink programmer
-in order to unlock it. Connect it like this:
+As the original firmware has the bootloader disabled a STLink programmer is 
+needed in order to unlock and flash the chip. Under Windows, the programmer 
+is interfaced using [ST Visual Programmer (STVP)](https://www.st.com/en/development-tools/stvp-stm8.html),
+minimal files of the commandline version can be found in the stpv folder. For 
+other operating systems [stm8flash](https://github.com/vdudouyt/stm8flash) is
+used.
+
+Connect the programmer like this:
 
 ![Programmer connection](images/stlink.jpg)
 
