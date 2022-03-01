@@ -68,3 +68,5 @@ dkms.conf
 # Others
 TODO
 images/IMG_*
+stvp
+.vscode
