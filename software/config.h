@@ -3,6 +3,7 @@
 
 // Hardware configuration:
 // #define DISP_DRIVER_ET6226
+// #define MAX_POWER_110W
 
 // F_xxx is in Hz
 #define F_CPU 16000000L
@@ -35,9 +36,15 @@
 #define CUR_DOT_OFFSET 3
 
 #define POW_MIN 1 //mW
-#define POW_MAX 60000 //mW: maximum settable power
 #define POW_DOT_OFFSET 3
+
+#ifdef MAX_POWER_110W
+#define POW_MAX 110000 //mW: maximum settable power
+#define POW_ABS_MAX 115000 //mW: Current at which the load current is reduced
+#else
+#define POW_MAX 60000 //mW: maximum settable power
 #define POW_ABS_MAX 65000 //mW: Current at which the load current is reduced
+#endif
 
 /* Usable range:
    Rmin = 1V / 10A = 0.1 Ohm

@@ -1,5 +1,8 @@
 # ZPB30A1 Firmware
-This repository is there to build an open-source firmware for the 60W ZPB30A1 electronic load (often sold as "60W electronic load" without any article number).
+This repository is there to build an open-source firmware for the ZPB30A1 
+electronic load (often sold as "60W/110W electronic load" without any article 
+number).
+
 
 ## Features
 * Modes
@@ -39,6 +42,13 @@ ET6226 drivers are sandwiched between display board and LED segment displays,
 while the underside of the board stays unpopulated. Also the ET6226 driver board 
 is possibly marked as V2.9. See image folder or [this issue](https://github.com/herm/ZPB30A1_Firmware/issues/3) 
 for further information. 
+
+## Power rating
+The load is available with 60W or 110W power rating, distinguishable by the size 
+of the heatsink. The 60W version has a heatsink of roughly the hight and width 
+of the fan, whereas the heatsink of the 110W version is noticably higher and 
+wider than the fan. Uncomment `#define MAX_POWER_110W` in the config file to 
+increase maximum allowable power dissipation.
 
 
 ## Chip
