@@ -1,4 +1,6 @@
 CC=sdcc
+STVP=..\stvp\stvp_cmdline
+SVFP_FALGS=-Port=USB -ProgMode=SWIM -verbose -no_loop -no_log
 STM8FLASH=stm8flash
 CFLAGS=-mstm8 --std-sdcc11 --opt-code-speed
 DEFINES=STM8S005
@@ -16,7 +18,9 @@ IHX=$(MAIN:%.c=$(BUILDDIR)/%.ihx)
 HEX=$(IHX:.ihx=.hex)
 DEP=$(REL:%.rel=%.d)
 
-.PHONY: all bin mkdir clean flash unlock clear_eeprom_unix clear_eeprom_windows
+.PHONY: all mkdir bin clean flash unlock clear_eeprom \
+		mkdir_windows bin_windows clean_windows flash_windows unlock_windows clear_eeprom_windows \
+		mkdir_unix bin_unix clean_unix flash_unix unlock_unix clear_eeprom_unix
 
 all: bin
 
@@ -68,18 +72,19 @@ clean_unix:
 	rm -rf $(BUILDDIR)
 
 flash_windows: $(HEX)
-	stvp_cmdline -BoardName=$(PROGRAMMER) -Device=$(PROCESSOR) -Port=USB -ProgMode=SWIM \
-	-verbose -no_loop -no_log -FileProg=$<
+	$(STVP) -BoardName=$(PROGRAMMER) -Device=$(PROCESSOR) $(SVFP_FALGS) -FileProg=$<
 
 flash_unix: $(IHX)
 	$(STM8FLASH) -c $(PROGRAMMER) -p $(PROCESSOR) -w $<
 
-unlock_windows:
-	@echo "Unlocking is currently unsupported on windows"
-	false
+unlock_windows: unlock.hex
+	$(STVP) -BoardName=$(PROGRAMMER) -Device=$(PROCESSOR) $(SVFP_FALGS) -FileOption=$<
 
 unlock_unix:
 	$(STM8FLASH) -c $(PROGRAMMER) -p $(PROCESSOR) -u # Works in stm8flash versions after git commit f3f547b4
+
+clear_eeprom_windows: empty_eeprom.hex
+	$(STVP) -BoardName=$(PROGRAMMER) -Device=$(PROCESSOR) $(SVFP_FALGS) -FileData=$<
 
 clear_eeprom_unix: empty_eeprom
 	$(STM8FLASH) -c $(PROGRAMMER) -p $(PROCESSOR) -s eeprom -w $<
