@@ -96,8 +96,10 @@
 #define FAN_TEMPERATURE_LOW  400 // * 0.1°C
 #define FAN_ON_OFF_HYSTERESIS 50 // * 0.1°C
 #define FAN_ALWAYS_ON 0
-#define FAN_PWM_MAX 0xfff
-#define FAN_SPEED_LOW ((uint16_t)(FAN_PWM_MAX/20)) // PWM value
+#define FAN_PWM_FREQUENCY 20000 // Hz, assuming TIM3_PRESCALER_1
+#define FAN_MIN_DUTY 0.10 // lower duty cycle limit
+#define FAN_PWM_MAX ((uint16_t)((F_CPU)/(FAN_PWM_FREQUENCY)))
+#define FAN_SPEED_LOW ((uint16_t)((FAN_PWM_MAX)*(FAN_MIN_DUTY))) // PWM value
 #define FAN_SPEED_FULL FAN_PWM_MAX // PWM value. max: 0xffff
 
 // port B
